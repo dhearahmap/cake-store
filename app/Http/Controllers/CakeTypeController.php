@@ -27,7 +27,7 @@ class CakeTypeController extends Controller
             $cakeTypes = DB::table("cake_types")
                 ->select(DB::raw("id, name, deleted_at"))
                 ->where("cake_types.deleted_at", "=", null)
-                ->where("lower(cake_types.name)", "like", "%$search%")
+                ->where("cake_types.name", "like", "%$search%")
                 ->get();
         }
         return Inertia::render("CakeTypes/Index", [
