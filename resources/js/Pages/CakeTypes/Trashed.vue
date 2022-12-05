@@ -1,12 +1,9 @@
 <script setup>
-import { ref, defineComponent, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
-import TextInput from "@/Components/TextInput.vue";
-
-const search = ref(null);
 
 defineComponent({
     AppLayout,
@@ -15,48 +12,20 @@ defineComponent({
 });
 
 defineProps({
-    stores: Object
-});
-
-const onSearch = (search) => {
-    location.href = `/cakes/stores?search=${search}`;
-}
-
-onMounted(() => {
-    const params = new URLSearchParams(window.location.search);
-    const searchQuery = params.get('search');
-    search.value = searchQuery;
+    trashed_cake_types: Object
 });
 </script>
 
 <template>
-    <AppLayout title="Stores">
+    <AppLayout title="Cake Types">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Store Management
+                Trashed Cake Types
             </h2>
         </template>
 
-        <div class="py-10">
+        <div class="py-4">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="w-full flex">
-                    <div class="w-1/2">
-                        <Link :href="route('cakes.stores.create')">
-                        <PrimaryButton>
-                            Add New Store
-                        </PrimaryButton>
-                        </Link>
-                        <Link :href="route('cakes.stores.trashed')">
-                        <PrimaryButton class="ml-4">
-                            Trashed Store
-                        </PrimaryButton>
-                        </Link>
-                    </div>
-                    <div class="w-1/2">
-                        <TextInput id="search" type="text" class="block w-full" placeholder="Search Stores..."
-                            v-model="search" @keyup.enter="onSearch(search)" />
-                    </div>
-                </div>
                 <div class="bg-rose-200 overflow-hidden shadow-xl sm:rounded-lg mt-8">
                     <div class="flex flex-col">
                         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -71,11 +40,7 @@ onMounted(() => {
                                                 </th>
                                                 <th scope="col"
                                                     class="text-sm font-bold text-gray-900 px-6 py-4 text-left">
-                                                    Store Name
-                                                </th>
-                                                <th scope="col"
-                                                    class="text-sm font-bold text-gray-900 px-6 py-4 text-left">
-                                                    Store Address
+                                                    Cake Type Name
                                                 </th>
                                                 <th scope="col"
                                                     class="text-sm font-bold text-gray-900 px-6 py-4 text-left">
@@ -85,48 +50,46 @@ onMounted(() => {
                                         </thead>
                                         <tbody>
                                             <tr class="bg-rose-50 border-b transition duration-300 ease-in-out hover:bg-rose-100"
-                                                v-if="(stores.length > 0)" v-for="store in stores" :key="store.id">
+                                                v-if="(trashed_cake_types.length > 0)"
+                                                v-for="trashed_cake_type in trashed_cake_types"
+                                                :key="trashed_cake_type.id">
                                                 <td
                                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {{ store.id }}
+                                                    {{ trashed_cake_type.id }}
                                                 </td>
                                                 <td
                                                     class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                                    {{ store.name }}
-                                                </td>
-                                                <td
-                                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                                    {{ store.address }}
+                                                    {{ trashed_cake_type.name }}
                                                 </td>
                                                 <td
                                                     class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                                                     <Link :href="
                                                         route(
-                                                            'cakes.stores.edit',
-                                                            store.id
+                                                            'cakes.types.restore',
+                                                            trashed_cake_type.id
                                                         )
                                                     ">
                                                     <PrimaryButton>
-                                                        Edit
+                                                        Restore
                                                     </PrimaryButton>
                                                     </Link>
                                                     <Link :href="
     route(
-        'cakes.stores.destroy',
-        store.id
+        'cakes.types.destroy_permanent',
+        trashed_cake_type.id
     )
                                                     ">
                                                     <DangerButton class="ml-4">
-                                                        Remove
+                                                        Permanently Remove
                                                     </DangerButton>
                                                     </Link>
                                                 </td>
                                             </tr>
                                             <tr class="bg-rose-50 border-b transition duration-300 ease-in-out hover:bg-rose-100"
                                                 v-else>
-                                                <td colspan="4"
+                                                <td colspan="3"
                                                     class="text-sm text-center text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                                                    There is no data available
+                                                    There is no trashed data available
                                                 </td>
                                             </tr>
                                         </tbody>

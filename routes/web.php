@@ -16,12 +16,12 @@ use App\Http\Controllers\{CakeController, CakeTypeController, StoreController};
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+Route::get("/", function () {
+    return Inertia::render("Welcome", [
+        "canLogin" => Route::has("login"),
+        "canRegister" => Route::has("register"),
+        "laravelVersion" => Application::VERSION,
+        "phpVersion" => PHP_VERSION,
     ]);
 });
 
@@ -38,6 +38,9 @@ Route::middleware([
         ],
         function () {
             Route::get("/", [CakeController::class, "index"])->name("index");
+            Route::get("trashed", [CakeController::class, "trashed"])->name(
+                "trashed"
+            );
             Route::get("create", [CakeController::class, "create"])->name(
                 "create"
             );
@@ -54,6 +57,14 @@ Route::middleware([
                 CakeController::class,
                 "destroy",
             ])->name("destroy");
+            Route::get("{id}/destroy-permanent", [
+                CakeController::class,
+                "destroy_permanent",
+            ])->name("destroy_permanent");
+            Route::get("{id}/restore", [
+                CakeController::class,
+                "restore",
+            ])->name("restore");
 
             // Cake Types Endpoint
             Route::group(
@@ -62,10 +73,13 @@ Route::middleware([
                     "as" => "types.",
                 ],
                 function () {
-                    Route::get("/", [
+                    Route::get("/", [CakeTypeController::class, "index"])->name(
+                        "index"
+                    );
+                    Route::get("trashed", [
                         CakeTypeController::class,
-                        "index",
-                    ])->name("index");
+                        "trashed",
+                    ])->name("trashed");
                     Route::get("create", [
                         CakeTypeController::class,
                         "create",
@@ -86,6 +100,14 @@ Route::middleware([
                         CakeTypeController::class,
                         "destroy",
                     ])->name("destroy");
+                    Route::get("{id}/destroy-permanent", [
+                        CakeTypeController::class,
+                        "destroy_permanent",
+                    ])->name("destroy_permanent");
+                    Route::get("{id}/restore", [
+                        CakeTypeController::class,
+                        "restore",
+                    ])->name("restore");
                 }
             );
 
@@ -96,10 +118,13 @@ Route::middleware([
                     "as" => "stores.",
                 ],
                 function () {
-                    Route::get("/", [
+                    Route::get("/", [StoreController::class, "index"])->name(
+                        "index"
+                    );
+                    Route::get("trashed", [
                         StoreController::class,
-                        "index",
-                    ])->name("index");
+                        "trashed",
+                    ])->name("trashed");
                     Route::get("create", [
                         StoreController::class,
                         "create",
@@ -120,6 +145,14 @@ Route::middleware([
                         StoreController::class,
                         "destroy",
                     ])->name("destroy");
+                    Route::get("{id}/destroy-permanent", [
+                        StoreController::class,
+                        "destroy_permanent",
+                    ])->name("destroy_permanent");
+                    Route::get("{id}/restore", [
+                        StoreController::class,
+                        "restore",
+                    ])->name("restore");
                 }
             );
         }

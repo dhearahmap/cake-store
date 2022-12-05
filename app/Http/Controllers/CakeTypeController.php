@@ -12,16 +12,43 @@ class CakeTypeController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cakeTypes = DB::table("cake_types")
-            ->select(DB::raw("id, name, deleted_at"))
-            ->where("cake_types.deleted_at", "=", null)
-            ->get();
+        $search = $request->query("search");
+        if (empty($search)) {
+            $cakeTypes = DB::table("cake_types")
+                ->select(DB::raw("id, name, deleted_at"))
+                ->where("cake_types.deleted_at", "=", null)
+                ->get();
+        } else {
+            $cakeTypes = DB::table("cake_types")
+                ->select(DB::raw("id, name, deleted_at"))
+                ->where("cake_types.deleted_at", "=", null)
+                ->where("lower(cake_types.name)", "like", "%$search%")
+                ->get();
+        }
         return Inertia::render("CakeTypes/Index", [
             "cake_types" => $cakeTypes,
+        ]);
+    }
+
+    /**
+     * Display a listing of the trashed resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function trashed(Request $request)
+    {
+        $trashedCakeTypes = DB::table("cake_types")
+            ->select(DB::raw("id, name, deleted_at"))
+            ->where("cake_types.deleted_at", "!=", null)
+            ->get();
+        return Inertia::render("CakeTypes/Trashed", [
+            "trashed_cake_types" => $trashedCakeTypes,
         ]);
     }
 
@@ -115,6 +142,37 @@ class CakeTypeController extends Controller
             ->where("id", "=", $id)
             ->update([
                 "deleted_at" => Carbon::now(),
+            ]);
+        return back();
+    }
+
+    /**
+     * Permanently remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy_permanent($id)
+    {
+        DB::table("cake_types")
+            ->where("id", "=", $id)
+            ->delete();
+        return back();
+    }
+
+    /**
+     * Restore the specified trashed resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function restore($id)
+    {
+        DB::table("cake_types")
+            ->where("id", "=", $id)
+            ->where("deleted_at", "!=", null)
+            ->update([
+                "deleted_at" => null,
             ]);
         return back();
     }

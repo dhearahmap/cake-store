@@ -1,9 +1,12 @@
 <script setup>
-import { defineComponent } from 'vue';
+import { ref, defineComponent, onMounted } from 'vue';
 import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
+import TextInput from "@/Components/TextInput.vue";
+
+const search = ref(null);
 
 defineComponent({
     AppLayout,
@@ -13,6 +16,16 @@ defineComponent({
 
 defineProps({
     cake_types: Object
+});
+
+const onSearch = (search) => {
+    location.href = `/cakes/types?search=${search}`;
+}
+
+onMounted(() => {
+    const params = new URLSearchParams(window.location.search);
+    const searchQuery = params.get('search');
+    search.value = searchQuery;
 });
 </script>
 
@@ -24,13 +37,26 @@ defineProps({
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <Link :href="route('cakes.types.create')">
-                <PrimaryButton>
-                    Add New Cake Type
-                </PrimaryButton>
-                </Link>
+                <div class="w-full flex">
+                    <div class="w-1/2">
+                        <Link :href="route('cakes.types.create')">
+                        <PrimaryButton>
+                            Add New Cake Type
+                        </PrimaryButton>
+                        </Link>
+                        <Link :href="route('cakes.types.trashed')">
+                        <PrimaryButton class="ml-4">
+                            Trashed Cake Type
+                        </PrimaryButton>
+                        </Link>
+                    </div>
+                    <div class="w-1/2">
+                        <TextInput id="search" type="text" class="block w-full" placeholder="Search Cakes Types..."
+                            v-model="search" @keyup.enter="onSearch(search)" />
+                    </div>
+                </div>
                 <div class="bg-rose-200 overflow-hidden shadow-xl sm:rounded-lg mt-8">
                     <div class="flex flex-col">
                         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -45,7 +71,7 @@ defineProps({
                                                 </th>
                                                 <th scope="col"
                                                     class="text-sm font-bold text-gray-900 px-6 py-4 text-left">
-                                                    Cake Type
+                                                    Cake Type Name
                                                 </th>
                                                 <th scope="col"
                                                     class="text-sm font-bold text-gray-900 px-6 py-4 text-left">
@@ -55,7 +81,8 @@ defineProps({
                                         </thead>
                                         <tbody>
                                             <tr class="bg-rose-50 border-b transition duration-300 ease-in-out hover:bg-rose-100"
-                                                v-for="cake_type in cake_types" :key="cake_type.id">
+                                                v-if="(cake_types.length > 0)" v-for="cake_type in cake_types"
+                                                :key="cake_type.id">
                                                 <td
                                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {{ cake_type.id }}
@@ -86,6 +113,13 @@ defineProps({
                                                         Remove
                                                     </DangerButton>
                                                     </Link>
+                                                </td>
+                                            </tr>
+                                            <tr class="bg-rose-50 border-b transition duration-300 ease-in-out hover:bg-rose-100"
+                                                v-else>
+                                                <td colspan="3"
+                                                    class="text-sm text-center text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                                                    There is no data available
                                                 </td>
                                             </tr>
                                         </tbody>

@@ -26,6 +26,23 @@ class StoreController extends Controller
     }
 
     /**
+     * Display a listing of the trashed resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function trashed(Request $request)
+    {
+        $trashedStores = DB::table("stores")
+            ->select(DB::raw("id, name, address, deleted_at"))
+            ->where("stores.deleted_at", "!=", null)
+            ->get();
+        return Inertia::render("Stores/Trashed", [
+            "trashed_stores" => $trashedStores,
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -121,6 +138,37 @@ class StoreController extends Controller
             ->where("id", "=", $id)
             ->update([
                 "deleted_at" => Carbon::now(),
+            ]);
+        return back();
+    }
+
+    /**
+     * Permanently remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy_permanent($id)
+    {
+        DB::table("stores")
+            ->where("id", "=", $id)
+            ->delete();
+        return back();
+    }
+
+    /**
+     * Restore the specified trashed resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function restore($id)
+    {
+        DB::table("stores")
+            ->where("id", "=", $id)
+            ->where("deleted_at", "!=", null)
+            ->update([
+                "deleted_at" => null,
             ]);
         return back();
     }

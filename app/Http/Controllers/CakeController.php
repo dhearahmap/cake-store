@@ -12,24 +12,67 @@ class CakeController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cakes = DB::table("cakes")
-            ->select(
-                DB::raw("
+        $search = $request->query("search");
+        if (empty($search)) {
+            $cakes = DB::table("cakes")
+                ->select(
+                    DB::raw("
+                cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
+                cake_types.name as cake_type_name, stores.id as cake_store_id,
+                stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
+           ")
+                )
+                ->where("cakes.deleted_at", "=", null)
+                ->join("cake_types", "cake_types.id", "=", "cakes.type_id")
+                ->join("stores", "stores.id", "=", "cakes.store_id")
+                ->get();
+        } else {
+            $cakes = DB::table("cakes")
+                ->select(
+                    DB::raw("
                     cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
                     cake_types.name as cake_type_name, stores.id as cake_store_id,
                     stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
                ")
+                )
+                ->where("cakes.deleted_at", "=", null)
+                ->where("cakes.name", "like", "%$search%")
+                ->join("cake_types", "cake_types.id", "=", "cakes.type_id")
+                ->join("stores", "stores.id", "=", "cakes.store_id")
+                ->get();
+        }
+        return Inertia::render("Cakes/Index", [
+            "cakes" => $cakes,
+        ]);
+    }
+
+    /**
+     * Display a listing of the trashed resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function trashed(Request $request)
+    {
+        $trashedCakes = DB::table("cakes")
+            ->select(
+                DB::raw("
+                cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
+                cake_types.name as cake_type_name, stores.id as cake_store_id,
+                stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
+           ")
             )
-            ->where("cakes.deleted_at", "=", null)
+            ->where("cakes.deleted_at", "!=", null)
             ->join("cake_types", "cake_types.id", "=", "cakes.type_id")
             ->join("stores", "stores.id", "=", "cakes.store_id")
             ->get();
-        return Inertia::render("Cakes/Index", [
-            "cakes" => $cakes,
+        return Inertia::render("Cakes/Trashed", [
+            "trashed_cakes" => $trashedCakes,
         ]);
     }
 
@@ -172,6 +215,37 @@ class CakeController extends Controller
             ->where("id", "=", $id)
             ->update([
                 "deleted_at" => Carbon::now(),
+            ]);
+        return back();
+    }
+
+    /**
+     * Permanently remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy_permanent($id)
+    {
+        DB::table("cakes")
+            ->where("id", "=", $id)
+            ->delete();
+        return back();
+    }
+
+    /**
+     * Restore the specified trashed resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function restore($id)
+    {
+        DB::table("cakes")
+            ->where("id", "=", $id)
+            ->where("deleted_at", "!=", null)
+            ->update([
+                "deleted_at" => null,
             ]);
         return back();
     }
