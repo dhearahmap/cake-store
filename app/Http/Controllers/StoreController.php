@@ -12,14 +12,24 @@ class StoreController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $stores = DB::table("stores")
+        $search = $request -> query("search");
+        if (empty($search)) {
+            $stores = DB::table("stores")
+                ->select(DB::raw("id, name, address, deleted_at"))
+                ->where("stores.deleted_at", "=", null)
+                ->get();
+        } else {
+            $stores = DB::table("stores")
             ->select(DB::raw("id, name, address, deleted_at"))
             ->where("stores.deleted_at", "=", null)
+            ->where("stores.name", "like", "%$search%")
             ->get();
+        }
         return Inertia::render("Stores/Index", [
             "stores" => $stores,
         ]);

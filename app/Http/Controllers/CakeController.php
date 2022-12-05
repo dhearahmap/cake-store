@@ -25,7 +25,7 @@ class CakeController extends Controller
                 cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
                 cake_types.name as cake_type_name, stores.id as cake_store_id,
                 stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
-           ")
+            ")
                 )
                 ->where("cakes.deleted_at", "=", null)
                 ->join("cake_types", "cake_types.id", "=", "cakes.type_id")
@@ -38,7 +38,7 @@ class CakeController extends Controller
                     cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
                     cake_types.name as cake_type_name, stores.id as cake_store_id,
                     stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
-               ")
+                ")
                 )
                 ->where("cakes.deleted_at", "=", null)
                 ->where("cakes.name", "like", "%$search%")
@@ -65,7 +65,7 @@ class CakeController extends Controller
                 cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
                 cake_types.name as cake_type_name, stores.id as cake_store_id,
                 stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
-           ")
+            ")
             )
             ->where("cakes.deleted_at", "!=", null)
             ->join("cake_types", "cake_types.id", "=", "cakes.type_id")
@@ -149,10 +149,10 @@ class CakeController extends Controller
         $cake = DB::table("cakes")
             ->select(
                 DB::raw("
-               cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
-               cake_types.name as cake_type_name, stores.id as cake_store_id,
-               stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
-           ")
+                cakes.id as id, cakes.name as name, cake_types.id as cake_type_id,
+                cake_types.name as cake_type_name, stores.id as cake_store_id,
+                stores.name as cake_store_name, cakes.stock as stock, cakes.deleted_at as deleted_at
+            ")
             )
             ->where("cakes.id", "=", $id)
             ->where("cakes.deleted_at", "=", null)
